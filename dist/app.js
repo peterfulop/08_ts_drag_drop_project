@@ -5,6 +5,58 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+class ValidatableInput {
+    constructor(input) {
+        this.input = input;
+    }
+    validate() {
+        let validatableInput = this.input;
+        let isValid = true;
+        if (validatableInput.required) {
+            isValid =
+                isValid && validatableInput.value.toString().trim().length !== 0;
+            if (!isValid) {
+                alert(`${validatableInput.name} kitöltése kötelező!`);
+                return false;
+            }
+        }
+        if (validatableInput.minLength != null &&
+            typeof validatableInput.value === "string") {
+            isValid =
+                isValid && validatableInput.value.length > validatableInput.minLength;
+            if (!isValid) {
+                alert(`${validatableInput.name} hossza minimum ${validatableInput.minLength}!`);
+                return false;
+            }
+        }
+        if (validatableInput.maxLength != null &&
+            typeof validatableInput.value === "string") {
+            isValid =
+                isValid && validatableInput.value.length > validatableInput.maxLength;
+            if (!isValid) {
+                alert(`${validatableInput.name} hossza maximum ${validatableInput.maxLength}!`);
+                return false;
+            }
+        }
+        if (validatableInput.min != null &&
+            typeof validatableInput.value === "number") {
+            isValid = isValid && validatableInput.value >= validatableInput.min;
+            if (!isValid) {
+                alert(`${validatableInput.name} értéke minimum ${validatableInput.min}!`);
+                return false;
+            }
+        }
+        if (validatableInput.max != null &&
+            typeof validatableInput.value === "number") {
+            isValid = isValid && validatableInput.value <= validatableInput.max;
+            if (!isValid) {
+                alert(`${validatableInput.name} értéke maximum ${validatableInput.max}!`);
+                return false;
+            }
+        }
+        return isValid;
+    }
+}
 // autobind decorator: Need to set tsconfig => "experimentalDecorators": true
 function Autobind(_target, _methodName, descriptor) {
     const originalMethod = descriptor.value;
@@ -34,10 +86,25 @@ class ProjectInput {
         const enteredTitle = this.titleInputElement.value;
         const enteredDescription = this.descriptionInputElement.value;
         const enteredPeople = this.peopleInputElement.value;
-        if (enteredTitle.length === 0 ||
-            enteredDescription.length === 0 ||
-            enteredPeople.length === 0) {
-            alert("Invalid input, please try again again!");
+        const title = new ValidatableInput({
+            name: this.titleInputElement.name,
+            value: enteredTitle,
+            required: true,
+        });
+        const description = new ValidatableInput({
+            name: this.descriptionInputElement.name,
+            value: enteredDescription,
+            required: true,
+            minLength: 5,
+        });
+        const people = new ValidatableInput({
+            name: this.peopleInputElement.name,
+            value: +enteredPeople,
+            required: true,
+            min: 1,
+            max: 5,
+        });
+        if (!title.validate() || !description.validate() || !people.validate()) {
             return;
         }
         else {
