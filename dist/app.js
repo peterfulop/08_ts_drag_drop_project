@@ -69,6 +69,23 @@ function Autobind(_target, _methodName, descriptor) {
     };
     return adjDescritor;
 }
+// class Project {
+//   templateElement: HTMLTemplateElement;
+//   hostElement: HTMLDivElement;
+//   element: HTMLElement;
+//   constructor() {
+//     this.templateElement = document.getElementById(
+//       "project-input"
+//     ) as HTMLTemplateElement;
+//     this.hostElement = document.getElementById("app") as HTMLDivElement;
+//     const importedNode = document.importNode(
+//       this.templateElement.content,
+//       true
+//     );
+//     this.element = importedNode.firstElementChild as HTMLFormElement;
+//     this.element.id = "user-input";
+//   }
+// }
 class ProjectInput {
     constructor() {
         this.templateElement = document.getElementById("project-input");
@@ -134,4 +151,32 @@ class ProjectInput {
 __decorate([
     Autobind
 ], ProjectInput.prototype, "submitHandler", null);
-const a = new ProjectInput();
+var ProjectType;
+(function (ProjectType) {
+    ProjectType["ACTIVE"] = "active";
+    ProjectType["FINISHED"] = "finished";
+})(ProjectType || (ProjectType = {}));
+class ProjectList {
+    constructor(type) {
+        this.type = type;
+        this.templateElement = document.getElementById("project-list");
+        this.hostElement = document.getElementById("app");
+        const importedNode = document.importNode(this.templateElement.content, true);
+        this.element = importedNode.firstElementChild;
+        this.element.id = `${this.type}-projects`;
+        this.attach();
+        this.renderContent();
+    }
+    renderContent() {
+        const listId = `${this.type}-project-list`;
+        this.element.querySelector("ul").id = listId;
+        this.element.querySelector("h2").textContent =
+            this.type.toUpperCase() + "PROJECTS";
+    }
+    attach() {
+        this.hostElement.insertAdjacentElement("beforeend", this.element);
+    }
+}
+const prjInput = new ProjectInput();
+const activePrjList = new ProjectList(ProjectType.ACTIVE);
+const finishedPrjList = new ProjectList(ProjectType.FINISHED);
