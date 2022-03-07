@@ -296,14 +296,13 @@ class ProjectItem
   }
 
   @Autobind
-  dragStartHandler(_: DragEvent): void {
-    console.log("DragStart");
+  dragStartHandler(event: DragEvent): void {
+    event.dataTransfer!.setData("text/plain", this.project.Id);
+    event.dataTransfer!.effectAllowed = "move";
   }
 
   @Autobind
-  dragEndHandler(_: DragEvent): void {
-    console.log("DragEnd");
-  }
+  dragEndHandler(event: DragEvent): void {}
 
   configure(): void {
     this.element.addEventListener("dragstart", this.dragStartHandler);
@@ -332,15 +331,20 @@ class ProjectList
   }
 
   @Autobind
-  dragOverHandler(_: DragEvent): void {
-    const listEl = this.element.querySelector("ul");
-    listEl?.classList.add("droppable");
+  dragOverHandler(event: DragEvent): void {
+    if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+      event.preventDefault();
+      const listEl = this.element.querySelector("ul");
+      listEl?.classList.add("droppable");
+    }
   }
 
   @Autobind
-  dropHandler(_: DragEvent): void {
-    const listEl = this.element.querySelector("ul");
-    listEl?.classList.remove("droppable");
+  dropHandler(event: DragEvent): void {
+    console.log(event.dataTransfer!.getData("text/plain"));
+
+    // const listEl = this.element.querySelector("ul");
+    // listEl?.classList.remove("droppable");
   }
 
   @Autobind
@@ -351,9 +355,7 @@ class ProjectList
 
   configure() {
     this.element.addEventListener("dragover", this.dragOverHandler);
-
     this.element.addEventListener("dragleave", this.dragLeaveHandler);
-
     this.element.addEventListener("drop", this.dropHandler);
 
     projectState.addListener((projects: Project[]) => {

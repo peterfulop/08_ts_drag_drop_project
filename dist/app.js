@@ -199,12 +199,11 @@ class ProjectItem extends Component {
             return `${this.project.People} persons`;
         }
     }
-    dragStartHandler(_) {
-        console.log("DragStart");
+    dragStartHandler(event) {
+        event.dataTransfer.setData("text/plain", this.project.Id);
+        event.dataTransfer.effectAllowed = "move";
     }
-    dragEndHandler(_) {
-        console.log("DragEnd");
-    }
+    dragEndHandler(event) { }
     configure() {
         this.element.addEventListener("dragstart", this.dragStartHandler);
         this.element.addEventListener("dragend", this.dragEndHandler);
@@ -229,13 +228,17 @@ class ProjectList extends Component {
         this.configure();
         this.renderContent();
     }
-    dragOverHandler(_) {
-        const listEl = this.element.querySelector("ul");
-        listEl === null || listEl === void 0 ? void 0 : listEl.classList.add("droppable");
+    dragOverHandler(event) {
+        if (event.dataTransfer && event.dataTransfer.types[0] === "text/plain") {
+            event.preventDefault();
+            const listEl = this.element.querySelector("ul");
+            listEl === null || listEl === void 0 ? void 0 : listEl.classList.add("droppable");
+        }
     }
-    dropHandler(_) {
-        const listEl = this.element.querySelector("ul");
-        listEl === null || listEl === void 0 ? void 0 : listEl.classList.remove("droppable");
+    dropHandler(event) {
+        console.log(event.dataTransfer.getData("text/plain"));
+        // const listEl = this.element.querySelector("ul");
+        // listEl?.classList.remove("droppable");
     }
     dragLeaveHandler(_) {
         const listEl = this.element.querySelector("ul");
