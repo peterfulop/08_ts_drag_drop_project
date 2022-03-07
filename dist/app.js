@@ -229,7 +229,22 @@ class ProjectList extends Component {
         this.configure();
         this.renderContent();
     }
+    dragOverHandler(_) {
+        const listEl = this.element.querySelector("ul");
+        listEl === null || listEl === void 0 ? void 0 : listEl.classList.add("droppable");
+    }
+    dropHandler(_) {
+        const listEl = this.element.querySelector("ul");
+        listEl === null || listEl === void 0 ? void 0 : listEl.classList.remove("droppable");
+    }
+    dragLeaveHandler(_) {
+        const listEl = this.element.querySelector("ul");
+        listEl === null || listEl === void 0 ? void 0 : listEl.classList.remove("droppable");
+    }
     configure() {
+        this.element.addEventListener("dragover", this.dragOverHandler);
+        this.element.addEventListener("dragleave", this.dragLeaveHandler);
+        this.element.addEventListener("drop", this.dropHandler);
         projectState.addListener((projects) => {
             const relevantProjects = projects.filter((prj) => {
                 if (this.type === ProjectStatus.ACTIVE) {
@@ -256,6 +271,15 @@ class ProjectList extends Component {
         }
     }
 }
+__decorate([
+    Autobind
+], ProjectList.prototype, "dragOverHandler", null);
+__decorate([
+    Autobind
+], ProjectList.prototype, "dropHandler", null);
+__decorate([
+    Autobind
+], ProjectList.prototype, "dragLeaveHandler", null);
 const prjInput = new ProjectInput();
 const activePrjList = new ProjectList(ProjectStatus.ACTIVE);
 const finishedPrjList = new ProjectList(ProjectStatus.FINISHED);
