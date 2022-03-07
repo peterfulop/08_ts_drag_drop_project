@@ -19,9 +19,17 @@ class Project {
         this.Status = Status;
     }
 }
-class ProjectState {
+class State {
     constructor() {
         this.listeners = [];
+    }
+    addListener(listenerFn) {
+        this.listeners.push(listenerFn);
+    }
+}
+class ProjectState extends State {
+    constructor() {
+        super();
         this.projects = [];
     }
     static getInstance() {
@@ -30,9 +38,6 @@ class ProjectState {
         }
         this.instance = new ProjectState();
         return this.instance;
-    }
-    addListener(listenerFn) {
-        this.listeners.push(listenerFn);
     }
     addProject(title, description, people) {
         const newProject = new Project(Date.now().toString(), title, description, people, ProjectStatus.ACTIVE);
@@ -107,19 +112,33 @@ function Autobind(_target, _methodName, descriptor) {
     };
     return adjDescritor;
 }
-class ProjectInput {
-    constructor() {
-        this.templateElement = document.getElementById("project-input");
-        this.hostElement = document.getElementById("app");
+class Component {
+    constructor(templateId, hostElementId, insertAtStart, newElementId) {
+        this.templateElement = document.getElementById(templateId);
+        this.hostElement = document.getElementById(hostElementId);
         const importedNode = document.importNode(this.templateElement.content, true);
         this.element = importedNode.firstElementChild;
-        this.element.id = "user-input";
+        if (newElementId)
+            this.element.id = newElementId;
+        this.attach(insertAtStart);
+    }
+    attach(insertAtBeginning) {
+        this.hostElement.insertAdjacentElement(insertAtBeginning ? "afterbegin" : "beforeend", this.element);
+    }
+}
+class ProjectInput extends Component {
+    constructor() {
+        super("project-input", "app", true, "user-input");
         this.titleInputElement = this.element.querySelector("#title");
         this.descriptionInputElement = this.element.querySelector("#description");
         this.peopleInputElement = this.element.querySelector("#people");
-        this.attach();
         this.configure();
     }
+    configure() {
+        // use a decorator instead of .bind(this)
+        this.element.addEventListener("submit", this.submitHandler);
+    }
+    renderContent() { }
     gatherUserInput() {
         const enteredTitle = this.titleInputElement.value;
         const enteredDescription = this.descriptionInputElement.value;
@@ -161,26 +180,19 @@ class ProjectInput {
             this.clearInputs();
         }
     }
-    configure() {
-        // use a decorator instead of .bind(this)
-        this.element.addEventListener("submit", this.submitHandler);
-    }
-    attach() {
-        this.hostElement.insertAdjacentElement("afterbegin", this.element);
-    }
 }
 __decorate([
     Autobind
 ], ProjectInput.prototype, "submitHandler", null);
-class ProjectList {
+class ProjectList extends Component {
     constructor(type) {
+        super("project-list", "app", false, `${type}-projects`);
         this.type = type;
         this.assignedProjects = [];
-        this.templateElement = document.getElementById("project-list");
-        this.hostElement = document.getElementById("app");
-        const importedNode = document.importNode(this.templateElement.content, true);
-        this.element = importedNode.firstElementChild;
-        this.element.id = `${this.type}-projects`;
+        this.configure();
+        this.renderContent();
+    }
+    configure() {
         projectState.addListener((projects) => {
             const relevantProjects = projects.filter((prj) => {
                 if (this.type === ProjectStatus.ACTIVE) {
@@ -191,8 +203,13 @@ class ProjectList {
             this.assignedProjects = relevantProjects;
             this.renderProjects();
         });
-        this.attach();
         this.renderContent();
+    }
+    renderContent() {
+        const listId = `${this.type}-project-list`;
+        this.element.querySelector("ul").id = listId;
+        this.element.querySelector("h2").textContent =
+            this.type.toUpperCase() + "PROJECTS";
     }
     renderProjects() {
         const listEl = document.getElementById(`${this.type}-project-list`);
@@ -202,15 +219,6 @@ class ProjectList {
             listItem.textContent = prjItem.Title;
             listEl.appendChild(listItem);
         }
-    }
-    renderContent() {
-        const listId = `${this.type}-project-list`;
-        this.element.querySelector("ul").id = listId;
-        this.element.querySelector("h2").textContent =
-            this.type.toUpperCase() + "PROJECTS";
-    }
-    attach() {
-        this.hostElement.insertAdjacentElement("beforeend", this.element);
     }
 }
 const prjInput = new ProjectInput();
