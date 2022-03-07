@@ -1,4 +1,4 @@
-enum ProjectType {
+enum ProjectStatus {
   ACTIVE = "active",
   FINISHED = "finished",
 }
@@ -9,7 +9,7 @@ class Project {
     public Title: string,
     public Description: string,
     public People: number,
-    public Status: ProjectType
+    public Status: ProjectStatus
   ) {}
 }
 
@@ -40,7 +40,7 @@ class ProjectState {
       title,
       description,
       people,
-      ProjectType.ACTIVE
+      ProjectStatus.ACTIVE
     );
 
     this.projects.push(newProject);
@@ -247,7 +247,7 @@ class ProjectList {
   element: HTMLElement;
   assignedProjects: Project[] = [];
 
-  constructor(private type: ProjectType) {
+  constructor(private type: ProjectStatus) {
     this.templateElement = document.getElementById(
       "project-list"
     ) as HTMLTemplateElement;
@@ -261,7 +261,13 @@ class ProjectList {
     this.element.id = `${this.type}-projects`;
 
     projectState.addListener((projects: Project[]) => {
-      this.assignedProjects = projects;
+      const relevantProjects = projects.filter((prj) => {
+        if (this.type === ProjectStatus.ACTIVE) {
+          return prj.Status === ProjectStatus.ACTIVE;
+        }
+        return prj.Status === ProjectStatus.FINISHED;
+      });
+      this.assignedProjects = relevantProjects;
       this.renderProjects();
     });
 
@@ -273,6 +279,8 @@ class ProjectList {
     const listEl = document.getElementById(
       `${this.type}-project-list`
     )! as HTMLUListElement;
+
+    listEl.innerHTML = "";
     for (const prjItem of this.assignedProjects) {
       const listItem = document.createElement("li");
       listItem.textContent = prjItem.Title;
@@ -293,5 +301,5 @@ class ProjectList {
 }
 
 const prjInput = new ProjectInput();
-const activePrjList = new ProjectList(ProjectType.ACTIVE);
-const finishedPrjList = new ProjectList(ProjectType.FINISHED);
+const activePrjList = new ProjectList(ProjectStatus.ACTIVE);
+const finishedPrjList = new ProjectList(ProjectStatus.FINISHED);
