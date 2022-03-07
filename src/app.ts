@@ -1,6 +1,23 @@
+enum ProjectType {
+  ACTIVE = "active",
+  FINISHED = "finished",
+}
+
+class Project {
+  constructor(
+    public Id: string,
+    public Title: string,
+    public Description: string,
+    public People: number,
+    public Status: ProjectType
+  ) {}
+}
+
+type Listener = (items: Project[]) => void;
+
 class ProjectState {
-  private listeners: any[] = [];
-  private projects: any[] = [];
+  private listeners: Listener[] = [];
+  private projects: Project[] = [];
   private static instance: ProjectState;
 
   private constructor() {}
@@ -13,17 +30,19 @@ class ProjectState {
     return this.instance;
   }
 
-  addListener(listenerFn: Function) {
+  addListener(listenerFn: Listener) {
     this.listeners.push(listenerFn);
   }
 
   public addProject(title: string, description: string, people: number) {
-    const newProject = {
-      id: Date.now().toString(),
+    const newProject = new Project(
+      Date.now().toString(),
       title,
       description,
       people,
-    };
+      ProjectType.ACTIVE
+    );
+
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
@@ -129,25 +148,6 @@ function Autobind(
   return adjDescritor;
 }
 
-// class Project {
-//   templateElement: HTMLTemplateElement;
-//   hostElement: HTMLDivElement;
-//   element: HTMLElement;
-//   constructor() {
-//     this.templateElement = document.getElementById(
-//       "project-input"
-//     ) as HTMLTemplateElement;
-//     this.hostElement = document.getElementById("app") as HTMLDivElement;
-
-//     const importedNode = document.importNode(
-//       this.templateElement.content,
-//       true
-//     );
-//     this.element = importedNode.firstElementChild as HTMLFormElement;
-//     this.element.id = "user-input";
-//   }
-// }
-
 class ProjectInput {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
@@ -241,16 +241,11 @@ class ProjectInput {
   }
 }
 
-enum ProjectType {
-  ACTIVE = "active",
-  FINISHED = "finished",
-}
-
 class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
-  assignedProjects: any[] = [];
+  assignedProjects: Project[] = [];
 
   constructor(private type: ProjectType) {
     this.templateElement = document.getElementById(
@@ -265,7 +260,7 @@ class ProjectList {
     this.element = importedNode.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
 
-    projectState.addListener((projects: any[]) => {
+    projectState.addListener((projects: Project[]) => {
       this.assignedProjects = projects;
       this.renderProjects();
     });
@@ -280,7 +275,7 @@ class ProjectList {
     )! as HTMLUListElement;
     for (const prjItem of this.assignedProjects) {
       const listItem = document.createElement("li");
-      listItem.textContent = prjItem.title;
+      listItem.textContent = prjItem.Title;
       listEl.appendChild(listItem);
     }
   }

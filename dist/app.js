@@ -5,6 +5,20 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var ProjectType;
+(function (ProjectType) {
+    ProjectType["ACTIVE"] = "active";
+    ProjectType["FINISHED"] = "finished";
+})(ProjectType || (ProjectType = {}));
+class Project {
+    constructor(Id, Title, Description, People, Status) {
+        this.Id = Id;
+        this.Title = Title;
+        this.Description = Description;
+        this.People = People;
+        this.Status = Status;
+    }
+}
 class ProjectState {
     constructor() {
         this.listeners = [];
@@ -21,12 +35,7 @@ class ProjectState {
         this.listeners.push(listenerFn);
     }
     addProject(title, description, people) {
-        const newProject = {
-            id: Date.now().toString(),
-            title,
-            description,
-            people,
-        };
+        const newProject = new Project(Date.now().toString(), title, description, people, ProjectType.ACTIVE);
         this.projects.push(newProject);
         for (const listenerFn of this.listeners) {
             listenerFn(this.projects.slice());
@@ -98,23 +107,6 @@ function Autobind(_target, _methodName, descriptor) {
     };
     return adjDescritor;
 }
-// class Project {
-//   templateElement: HTMLTemplateElement;
-//   hostElement: HTMLDivElement;
-//   element: HTMLElement;
-//   constructor() {
-//     this.templateElement = document.getElementById(
-//       "project-input"
-//     ) as HTMLTemplateElement;
-//     this.hostElement = document.getElementById("app") as HTMLDivElement;
-//     const importedNode = document.importNode(
-//       this.templateElement.content,
-//       true
-//     );
-//     this.element = importedNode.firstElementChild as HTMLFormElement;
-//     this.element.id = "user-input";
-//   }
-// }
 class ProjectInput {
     constructor() {
         this.templateElement = document.getElementById("project-input");
@@ -180,11 +172,6 @@ class ProjectInput {
 __decorate([
     Autobind
 ], ProjectInput.prototype, "submitHandler", null);
-var ProjectType;
-(function (ProjectType) {
-    ProjectType["ACTIVE"] = "active";
-    ProjectType["FINISHED"] = "finished";
-})(ProjectType || (ProjectType = {}));
 class ProjectList {
     constructor(type) {
         this.type = type;
@@ -205,7 +192,7 @@ class ProjectList {
         const listEl = document.getElementById(`${this.type}-project-list`);
         for (const prjItem of this.assignedProjects) {
             const listItem = document.createElement("li");
-            listItem.textContent = prjItem.title;
+            listItem.textContent = prjItem.Title;
             listEl.appendChild(listItem);
         }
     }
