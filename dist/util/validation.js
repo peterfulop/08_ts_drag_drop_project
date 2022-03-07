@@ -1,0 +1,52 @@
+export class ValidatableInput {
+    constructor(input) {
+        this.input = input;
+    }
+    validate() {
+        let validatableInput = this.input;
+        let isValid = true;
+        if (validatableInput.required) {
+            isValid =
+                isValid && validatableInput.value.toString().trim().length !== 0;
+            if (!isValid) {
+                alert(`${validatableInput.name} kitöltése kötelező!`);
+                return false;
+            }
+        }
+        if (validatableInput.minLength != null &&
+            typeof validatableInput.value === "string") {
+            isValid =
+                isValid && validatableInput.value.length > validatableInput.minLength;
+            if (!isValid) {
+                alert(`${validatableInput.name} hossza minimum ${validatableInput.minLength}!`);
+                return false;
+            }
+        }
+        if (validatableInput.maxLength != null &&
+            typeof validatableInput.value === "string") {
+            isValid =
+                isValid && validatableInput.value.length > validatableInput.maxLength;
+            if (!isValid) {
+                alert(`${validatableInput.name} hossza maximum ${validatableInput.maxLength}!`);
+                return false;
+            }
+        }
+        if (validatableInput.min != null &&
+            typeof validatableInput.value === "number") {
+            isValid = isValid && validatableInput.value >= validatableInput.min;
+            if (!isValid) {
+                alert(`${validatableInput.name} értéke minimum ${validatableInput.min}!`);
+                return false;
+            }
+        }
+        if (validatableInput.max != null &&
+            typeof validatableInput.value === "number") {
+            isValid = isValid && validatableInput.value <= validatableInput.max;
+            if (!isValid) {
+                alert(`${validatableInput.name} értéke maximum ${validatableInput.max}!`);
+                return false;
+            }
+        }
+        return isValid;
+    }
+}
