@@ -4,10 +4,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-import { Autobind } from "../decorators/autobind.js";
-import { projectState } from "../state/project-state.js";
-import { ValidatableInput } from "../util/validation.js";
-import Component from "./base-component.js";
+import { Autobind } from "../decorators/autobind";
+import { projectState } from "../state/project-state";
+import { ValidatableInput } from "../util/validation";
+import Component from "./base-component";
 export default class ProjectInput extends Component {
     constructor() {
         super("project-input", "app", true, "user-input");
