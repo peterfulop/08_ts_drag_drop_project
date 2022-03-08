@@ -7,8 +7,8 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 import { Autobind } from "../decorators/autobind.js";
 import { projectState } from "../state/project-state.js";
 import { ValidatableInput } from "../util/validation.js";
-import { Component } from "./base-component.js";
-export class ProjectInput extends Component {
+import Component from "./base-component.js";
+export default class ProjectInput extends Component {
     constructor() {
         super("project-input", "app", true, "user-input");
         this.titleInputElement = this.element.querySelector("#title");
